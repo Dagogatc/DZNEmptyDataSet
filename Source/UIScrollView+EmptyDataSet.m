@@ -738,6 +738,8 @@ Class dzn_baseClassToSwizzleForTarget(id target)
     CGRect superviewBounds = self.superview.bounds;
     self.frame = CGRectMake(0.0, 0.0, CGRectGetWidth(superviewBounds), CGRectGetHeight(superviewBounds));
     
+    self.layer.zPosition = -1;
+    
     __weak __typeof(_contentView) weakContentView = _contentView;
     void(^fadeInBlock)(void) = ^{weakContentView.alpha = 1.0;};
     

@@ -736,7 +736,13 @@ Class dzn_baseClassToSwizzleForTarget(id target)
 - (void)didMoveToSuperview
 {
     CGRect superviewBounds = self.superview.bounds;
-    self.frame = CGRectMake(0.0, 0.0, CGRectGetWidth(superviewBounds), CGRectGetHeight(superviewBounds));
+    CGFloat originY = 0.0;
+    if (@available(iOS 11.0, *)) {
+        if ([self.superview isKindOfClass:[UIScrollView class]]) {
+            originY -= ((UIScrollView *)self.superview).adjustedContentInset.top;
+        }
+    }
+    self.frame = CGRectMake(0.0, originY, CGRectGetWidth(superviewBounds), CGRectGetHeight(superviewBounds));
     
     self.layer.zPosition = -1;
     

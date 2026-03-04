@@ -735,20 +735,13 @@ Class dzn_baseClassToSwizzleForTarget(id target)
 
 - (void)didMoveToSuperview
 {
-    CGRect superviewBounds = self.superview.bounds;
-    CGFloat originY = 0.0;
-    if (@available(iOS 11.0, *)) {
-        if ([self.superview isKindOfClass:[UIScrollView class]]) {
-            originY -= ((UIScrollView *)self.superview).adjustedContentInset.top;
-        }
-    }
-    self.frame = CGRectMake(0.0, originY, CGRectGetWidth(superviewBounds), CGRectGetHeight(superviewBounds));
-    
+    [self updateFrameFromSuperview];
+
     self.layer.zPosition = -1;
-    
+
     __weak __typeof(_contentView) weakContentView = _contentView;
     void(^fadeInBlock)(void) = ^{weakContentView.alpha = 1.0;};
-    
+
     if (self.fadeInOnDisplay) {
         [UIView animateWithDuration:0.25
                          animations:fadeInBlock
@@ -756,6 +749,27 @@ Class dzn_baseClassToSwizzleForTarget(id target)
     }
     else {
         fadeInBlock();
+    }
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self updateFrameFromSuperview];
+}
+
+- (void)updateFrameFromSuperview
+{
+    CGRect superviewBounds = self.superview.bounds;
+    CGFloat originY = 0.0;
+    if (@available(iOS 11.0, *)) {
+        if ([self.superview isKindOfClass:[UIScrollView class]]) {
+            originY -= ((UIScrollView *)self.superview).adjustedContentInset.top;
+        }
+    }
+    CGRect newFrame = CGRectMake(0.0, originY, CGRectGetWidth(superviewBounds), CGRectGetHeight(superviewBounds));
+    if (!CGRectEqualToRect(self.frame, newFrame)) {
+        self.frame = newFrame;
     }
 }
 
